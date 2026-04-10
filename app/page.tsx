@@ -50,11 +50,16 @@ export default function Dashboard() {
 
   useEffect(() => {
     setIsMounted(true);
-    fetchAllData().then(data => {
-      setCategories(data.categories.length > 0 ? data.categories : DEFAULT_CATEGORIES);
-      setTransactions(data.transactions.length > 0 ? data.transactions : DEFAULT_TRANSACTIONS);
-      setBudgets(data.budgets);
-    });
+    fetchAllData()
+      .then(data => {
+        setCategories(data.categories.length > 0 ? data.categories : DEFAULT_CATEGORIES);
+        setTransactions(data.transactions.length > 0 ? data.transactions : DEFAULT_TRANSACTIONS);
+        setBudgets(data.budgets);
+      })
+      .catch(error => {
+        console.error("Failed to fetch data from NeonDB:", error);
+        alert("データベースからのデータ取得に失敗しました。Vercelの環境変数等の設定を確認してください。エラー: " + error.message);
+      });
   }, []);
 
   const filteredTransactions = useMemo(() => {
