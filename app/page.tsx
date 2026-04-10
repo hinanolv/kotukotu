@@ -12,6 +12,7 @@ import FAB from '@/components/FAB';
 import MonthSwitcher from '@/components/MonthSwitcher';
 import CategoryPieChart from '@/components/CategoryPieChart';
 import ExportButton from '@/components/ExportButton';
+import BackupButton from '@/components/BackupButton';
 import styles from './page.module.css';
 
 const DEFAULT_CATEGORIES: Category[] = [
@@ -148,6 +149,7 @@ export default function Dashboard() {
           <p className={styles.subtitle}>{selectedMonth.replace('-', '年')}月の支出状況</p>
         </div>
         <div className={styles.headerActions}>
+          <BackupButton />
           <ExportButton transactions={transactions} categories={categories} />
           <ThemeToggle />
         </div>
