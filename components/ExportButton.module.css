@@ -1,0 +1,36 @@
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--foreground);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
+  cursor: pointer;
+}
+
+.button:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.button:active {
+  transform: scale(0.95);
+}
+
+.icon {
+  font-size: 1.125rem;
+}
+
+@media (max-width: 480px) {
+  .button span:not(.icon) {
+    display: none; /* Hide text on very small screens, show only icon */
+  }
+}

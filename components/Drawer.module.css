@@ -1,0 +1,102 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.drawer {
+  position: fixed;
+  background: var(--card-bg);
+  z-index: 1001;
+  transition: transform 0.3s ease;
+  box-shadow: 0 -10px 25px -5px rgb(0 0 0 / 0.1);
+}
+
+/* Mobile: Bottom Sheet */
+@media (max-width: 640px) {
+  .drawer {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-top-left-radius: 1.5rem;
+    border-top-right-radius: 1.5rem;
+    transform: translateY(100%);
+    max-height: 90vh;
+    padding: 1.5rem;
+  }
+  
+  .drawer.open {
+    transform: translateY(0);
+  }
+
+  .handle {
+    width: 3rem;
+    height: 0.25rem;
+    background: var(--card-border);
+    border-radius: 9999px;
+    margin: 0 auto 1.5rem auto;
+  }
+}
+
+/* PC: Right Sidebar/Drawer */
+@media (min-width: 641px) {
+  .drawer {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 400px;
+    transform: translateX(100%);
+    padding: 2.5rem;
+    border-left: 1px solid var(--card-border);
+  }
+
+  .drawer.open {
+    transform: translateX(0);
+  }
+
+  .handle {
+    display: none;
+  }
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 2rem;
+  color: var(--foreground);
+}
+
+.closeButton {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--background);
+  border: 1px solid var(--card-border);
+  color: var(--muted);
+  transition: all 0.2s ease;
+}
+
+.closeButton:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
