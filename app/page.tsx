@@ -13,9 +13,9 @@ import MonthSwitcher from '@/components/MonthSwitcher';
 import CategoryPieChart from '@/components/CategoryPieChart';
 import ExportButton from '@/components/ExportButton';
 import BackupButton from '@/components/BackupButton';
-import { 
-  fetchAllData, addCategoryAction, addTransactionAction, 
-  updateTransactionAction, deleteTransactionAction, updateBudgetAction 
+import {
+  fetchAllData, addCategoryAction, addTransactionAction,
+  updateTransactionAction, deleteTransactionAction, updateBudgetAction
 } from './actions';
 import styles from './page.module.css';
 
@@ -83,7 +83,7 @@ export default function Dashboard() {
     const tempId = Math.random().toString(36).substr(2, 9);
     const newCategory: Category = { id: tempId, name };
     setCategories([...categories, newCategory]);
-    
+
     // Call server action
     const savedCategory = await addCategoryAction(name);
     setCategories(prev => prev.map(c => c.id === tempId ? savedCategory : c));
@@ -111,7 +111,7 @@ export default function Dashboard() {
   const handleFormSubmit = async (data: Omit<Transaction, 'id'>) => {
     if (editingTransaction) {
       // Update existing optimistically
-      setTransactions(prev => prev.map(t => 
+      setTransactions(prev => prev.map(t =>
         t.id === editingTransaction.id ? { ...t, ...data } : t
       ));
       await updateTransactionAction(editingTransaction.id, data);
@@ -120,14 +120,14 @@ export default function Dashboard() {
       const tempId = Math.random().toString(36).substr(2, 9);
       const newTransaction: Transaction = { id: tempId, ...data };
       setTransactions(prev => [newTransaction, ...prev]);
-      
+
       const savedTransaction = await addTransactionAction(data);
       setTransactions(prev => prev.map(t => t.id === tempId ? savedTransaction : t));
     }
-    
+
     setIsDrawerOpen(false);
     setEditingTransaction(null);
-    
+
     // Auto-switch to the month of the added/edited transaction
     const targetMonth = data.date.substring(0, 7);
     if (targetMonth !== selectedMonth) {
@@ -142,63 +142,68 @@ export default function Dashboard() {
   return (
     <main className={styles.main}>
       <header className={styles.header}>
-        <div>
-          <h1 className={styles.title}>Kakeibo Dashboard</h1>
-          <p className={styles.subtitle}>{selectedMonth.replace('-', '年')}月の支出状況</p>
-        </div>
-        <div className={styles.headerActions}>
-          <BackupButton />
-          <ExportButton transactions={transactions} categories={categories} />
-          <ThemeToggle />
+        <div className={styles.headerInner}>
+          <div>
+            <h1 className={styles.title}>Kotukotu</h1>
+            <p className={styles.subtitle}>{selectedMonth.replace('-', '年')}月の支出状況</p>
+          </div>
+          <div className={styles.headerActions}>
+            <BackupButton />
+            <ExportButton transactions={transactions} categories={categories} />
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 
-      <MonthSwitcher currentMonth={selectedMonth} onChange={setSelectedMonth} />
-
-      <SummaryCard 
-        total={totalAmount} 
-        budget={currentBudget} 
-        onUpdateBudget={handleUpdateBudget} 
-      />
-
-      <div className={styles.contentGrid}>
-        <div className={styles.mainColumn}>
-          <section className={styles.section}>
-            <div className={styles.sectionHeader}>
-              <h2 className={styles.sectionTitle}>取引履歴 ({selectedMonth.replace('-', '年')}月)</h2>
-            </div>
-            <TransactionList 
-              transactions={filteredTransactions} 
-              categories={categories} 
-              onEdit={handleOpenEditDrawer}
-              onDelete={handleDeleteTransaction}
-            />
-          </section>
-
-          <CategoryManager 
-            categories={categories} 
-            onAddCategory={handleAddCategory} 
-          />
+      <div className={styles.container}>
+        <div className={styles.toolbar}>
+          <MonthSwitcher currentMonth={selectedMonth} onChange={setSelectedMonth} />
         </div>
 
-        <div className={styles.sideColumn}>
-          <CategoryPieChart 
-            transactions={filteredTransactions} 
-            categories={categories} 
-          />
+        <div className={styles.contentGrid}>
+          <div className={styles.mainColumn}>
+            <section className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <h2 className={styles.sectionTitle}>取引履歴 ({selectedMonth.replace('-', '年')}月)</h2>
+              </div>
+              <TransactionList
+                transactions={filteredTransactions}
+                categories={categories}
+                onEdit={handleOpenEditDrawer}
+                onDelete={handleDeleteTransaction}
+              />
+            </section>
+
+            <CategoryManager
+              categories={categories}
+              onAddCategory={handleAddCategory}
+            />
+          </div>
+
+          <div className={styles.sideColumn}>
+            <SummaryCard
+              total={totalAmount}
+              budget={currentBudget}
+              onUpdateBudget={handleUpdateBudget}
+            />
+            <CategoryPieChart
+              transactions={filteredTransactions}
+              categories={categories}
+            />
+          </div>
         </div>
       </div>
 
       <FAB onClick={handleOpenAddDrawer} />
 
-      <Drawer 
-        isOpen={isDrawerOpen} 
-        onClose={() => setIsDrawerOpen(false)} 
+      <Drawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
         title={editingTransaction ? '出費の編集' : '出費の登録'}
       >
-        <AddTransactionForm 
-          categories={categories} 
-          onSubmit={handleFormSubmit} 
+        <AddTransactionForm
+          categories={categories}
+          onSubmit={handleFormSubmit}
           initialData={editingTransaction}
         />
       </Drawer>
