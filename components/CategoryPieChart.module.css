@@ -17,7 +17,8 @@
 }
 
 .chartWrapper {
-  flex-grow: 1;
+  width: 100%;
+  aspect-ratio: 1 / 1;
   min-height: 300px;
   position: relative;
 }

@@ -29,8 +29,7 @@ export default function TransactionList({ transactions, categories, onEdit, onDe
         <table className={styles.table}>
           <thead>
             <tr>
-              <th className={styles.th}>日付</th>
-              <th className={styles.th}>カテゴリ</th>
+              <th className={styles.th}>内容</th>
               <th className={styles.th}>メモ</th>
               <th className={styles.th} style={{textAlign: 'right'}}>金額</th>
               <th className={styles.th} style={{textAlign: 'right'}}>操作</th>
@@ -39,11 +38,11 @@ export default function TransactionList({ transactions, categories, onEdit, onDe
           <tbody>
             {transactions.map((t) => (
               <tr key={t.id} className={styles.tr}>
-                <td className={styles.td} data-label="日付">
-                  <div className={styles.date}>{t.date}</div>
-                </td>
-                <td className={styles.td} data-label="カテゴリ">
-                  <span className={styles.category}>{getCategoryName(t.categoryId)}</span>
+                <td className={styles.td} data-label="内容">
+                  <div className={styles.infoCell}>
+                    <span className={styles.categoryBadge}>{getCategoryName(t.categoryId)}</span>
+                    <span className={styles.dateText}>{t.date}</span>
+                  </div>
                 </td>
                 <td className={styles.td} data-label="メモ">
                   <div className={styles.memo}>{t.memo || '-'}</div>

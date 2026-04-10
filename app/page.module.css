@@ -76,6 +76,7 @@
 
   .sideColumn {
     order: 2; /* Desktop: right */
+    align-self: flex-start;
   }
 }
 
