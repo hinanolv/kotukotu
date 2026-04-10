@@ -1,0 +1,152 @@
+{
+  "categories": [
+    {
+      "id": "1",
+      "name": "食費"
+    },
+    {
+      "id": "2",
+      "name": "日用品"
+    },
+    {
+      "id": "3",
+      "name": "交際費"
+    },
+    {
+      "id": "4",
+      "name": "固定費"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "7cwfbhp7y",
+      "date": "2026-04-10",
+      "amount": 330,
+      "categoryId": "1",
+      "memo": "ベローチェ　アイスコーヒー"
+    },
+    {
+      "id": "px6dvgg6y",
+      "date": "2026-04-10",
+      "amount": 310,
+      "categoryId": "1",
+      "memo": "ファミマ　麦茶　ガム"
+    },
+    {
+      "id": "f6yj4sw9w",
+      "date": "2026-04-07",
+      "amount": 319,
+      "categoryId": "1",
+      "memo": "セブン　ポテチ　サクチョコ"
+    },
+    {
+      "id": "t7yzvpo45",
+      "date": "2026-04-07",
+      "amount": 733,
+      "categoryId": "1",
+      "memo": "セブン　ラキスト　豆乳ココア"
+    },
+    {
+      "id": "r5giwzjmb",
+      "date": "2026-04-07",
+      "amount": 118,
+      "categoryId": "1",
+      "memo": "ファミマ　麦茶"
+    },
+    {
+      "id": "0xxu33hds",
+      "date": "2026-04-07",
+      "amount": 330,
+      "categoryId": "1",
+      "memo": "ベローチェ　アイスコーヒー"
+    },
+    {
+      "id": "kr49rjwne",
+      "date": "2026-04-06",
+      "amount": 330,
+      "categoryId": "1",
+      "memo": "ベローチェ　アイスコーヒー"
+    },
+    {
+      "id": "6b4hwmmp1",
+      "date": "2026-04-06",
+      "amount": 118,
+      "categoryId": "1",
+      "memo": "ファミマ　麦茶"
+    },
+    {
+      "id": "2bg5gohh9",
+      "date": "2026-04-05",
+      "amount": 576,
+      "categoryId": "1",
+      "memo": "セブン　おにぎりx2　パンケーキ"
+    },
+    {
+      "id": "g23esju2a",
+      "date": "2026-04-04",
+      "amount": 4980,
+      "categoryId": "2",
+      "memo": "ローソン　アイコス本体 2000円引きクーポン"
+    },
+    {
+      "id": "avp8puazq",
+      "date": "2026-04-03",
+      "amount": 717,
+      "categoryId": "1",
+      "memo": "セブン　モンスター半額　レモンサワーx2　糖質ゼロ　レジ袋"
+    },
+    {
+      "id": "h2r2hp75i",
+      "date": "2026-04-03",
+      "amount": 277,
+      "categoryId": "1",
+      "memo": "ファミマ　麦茶、忍者メシ"
+    },
+    {
+      "id": "g6nrs6nrh",
+      "date": "2026-04-03",
+      "amount": 330,
+      "categoryId": "1",
+      "memo": "ベローチェ　アイスコーヒー"
+    },
+    {
+      "id": "mahijilgb",
+      "date": "2026-04-02",
+      "amount": 1240,
+      "categoryId": "2",
+      "memo": "アイコス、ラキスト"
+    },
+    {
+      "id": "h00c3szjv",
+      "date": "2026-03-31",
+      "amount": 277,
+      "categoryId": "1",
+      "memo": "ファミマ　麦茶　忍者メシ"
+    },
+    {
+      "id": "88mwjeoz4",
+      "date": "2026-03-31",
+      "amount": 430,
+      "categoryId": "1",
+      "memo": "ベローチェ　モーニングセット"
+    },
+    {
+      "id": "o6fhqist2",
+      "date": "2026-03-30",
+      "amount": 307,
+      "categoryId": "1",
+      "memo": "ファミマ　クッキー　麦茶"
+    },
+    {
+      "id": "fbcc02p0m",
+      "date": "2026-04-10",
+      "amount": 1100,
+      "categoryId": "1",
+      "memo": "昼食　ラーショ"
+    }
+  ],
+  "budgets": {
+    "2026-04": 30000
+  },
+  "exportedAt": "2026-04-10T06:46:20.280Z"
+}

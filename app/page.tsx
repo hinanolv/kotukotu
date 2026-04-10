@@ -13,6 +13,10 @@ import MonthSwitcher from '@/components/MonthSwitcher';
 import CategoryPieChart from '@/components/CategoryPieChart';
 import ExportButton from '@/components/ExportButton';
 import BackupButton from '@/components/BackupButton';
+import { 
+  fetchAllData, addCategoryAction, addTransactionAction, 
+  updateTransactionAction, deleteTransactionAction, updateBudgetAction 
+} from './actions';
 import styles from './page.module.css';
 
 const DEFAULT_CATEGORIES: Category[] = [
@@ -46,29 +50,12 @@ export default function Dashboard() {
 
   useEffect(() => {
     setIsMounted(true);
-    const savedCategories = localStorage.getItem('kakeibo_categories');
-    if (savedCategories) setCategories(JSON.parse(savedCategories));
-    else setCategories(DEFAULT_CATEGORIES);
-
-    const savedTransactions = localStorage.getItem('kakeibo_transactions');
-    if (savedTransactions) setTransactions(JSON.parse(savedTransactions));
-    else setTransactions(DEFAULT_TRANSACTIONS);
-
-    const savedBudgets = localStorage.getItem('kakeibo_budgets');
-    if (savedBudgets) setBudgets(JSON.parse(savedBudgets));
+    fetchAllData().then(data => {
+      setCategories(data.categories.length > 0 ? data.categories : DEFAULT_CATEGORIES);
+      setTransactions(data.transactions.length > 0 ? data.transactions : DEFAULT_TRANSACTIONS);
+      setBudgets(data.budgets);
+    });
   }, []);
-
-  useEffect(() => {
-    if (isMounted) localStorage.setItem('kakeibo_categories', JSON.stringify(categories));
-  }, [categories, isMounted]);
-
-  useEffect(() => {
-    if (isMounted) localStorage.setItem('kakeibo_transactions', JSON.stringify(transactions));
-  }, [transactions, isMounted]);
-
-  useEffect(() => {
-    if (isMounted) localStorage.setItem('kakeibo_budgets', JSON.stringify(budgets));
-  }, [budgets, isMounted]);
 
   const filteredTransactions = useMemo(() => {
     return transactions
@@ -82,16 +69,19 @@ export default function Dashboard() {
 
   const currentBudget = budgets[selectedMonth] || 50000;
 
-  const handleUpdateBudget = (newBudget: number) => {
+  const handleUpdateBudget = async (newBudget: number) => {
     setBudgets(prev => ({ ...prev, [selectedMonth]: newBudget }));
+    await updateBudgetAction(selectedMonth, newBudget);
   };
 
-  const handleAddCategory = (name: string) => {
-    const newCategory: Category = {
-      id: Math.random().toString(36).substr(2, 9),
-      name,
-    };
+  const handleAddCategory = async (name: string) => {
+    const tempId = Math.random().toString(36).substr(2, 9);
+    const newCategory: Category = { id: tempId, name };
     setCategories([...categories, newCategory]);
+    
+    // Call server action
+    const savedCategory = await addCategoryAction(name);
+    setCategories(prev => prev.map(c => c.id === tempId ? savedCategory : c));
   };
 
   const handleOpenAddDrawer = () => {
@@ -106,25 +96,28 @@ export default function Dashboard() {
     }
   };
 
-  const handleDeleteTransaction = (id: string) => {
+  const handleDeleteTransaction = async (id: string) => {
     if (window.confirm('この取引を削除してもよろしいですか？')) {
       setTransactions(prev => prev.filter(t => t.id !== id));
+      await deleteTransactionAction(id);
     }
   };
 
-  const handleFormSubmit = (data: Omit<Transaction, 'id'>) => {
+  const handleFormSubmit = async (data: Omit<Transaction, 'id'>) => {
     if (editingTransaction) {
-      // Update existing
+      // Update existing optimistically
       setTransactions(prev => prev.map(t => 
         t.id === editingTransaction.id ? { ...t, ...data } : t
       ));
+      await updateTransactionAction(editingTransaction.id, data);
     } else {
-      // Add new
-      const newTransaction: Transaction = {
-        id: Math.random().toString(36).substr(2, 9),
-        ...data,
-      };
+      // Add new optimistically
+      const tempId = Math.random().toString(36).substr(2, 9);
+      const newTransaction: Transaction = { id: tempId, ...data };
       setTransactions(prev => [newTransaction, ...prev]);
+      
+      const savedTransaction = await addTransactionAction(data);
+      setTransactions(prev => prev.map(t => t.id === tempId ? savedTransaction : t));
     }
     
     setIsDrawerOpen(false);

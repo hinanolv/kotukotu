@@ -1,0 +1,49 @@
+﻿node.exe : Prisma schema l
+oaded from prisma\schema.p
+risma.
+発生場所 行:1 文字:1
++ & "C:\nvm4w\nodejs/node.
+exe" "C:\nvm4w\nodejs/node
+_modules/npm/bin/np ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: (P  
+  risma schema l...\sch   
+ ema.prisma.:String) [    
+], RemoteException
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+Error: Prisma schema valid
+ation - (get-config wasm)
+Error code: P1012
+error: The datasource prop
+erty `url` is no longer su
+pported in schema files. M
+ove connection URLs for Mi
+grate to `prisma.config.ts
+` and pass either `adapter
+` for a direct database co
+nnection or `accelerateUrl
+` for Accelerate to the `P
+rismaClient` constructor. 
+See https://pris.ly/d/conf
+ig-datasource and https://
+pris.ly/d/prisma7-client-c
+onfig
+  -->  prisma\schema.prism
+a:7
+   | 
+ 6 |   provider = "postgre
+sql"
+ 7 |   url      = env("DAT
+ABASE_URL")
+   | 
+
+Validation Error Count: 1
+[Context: getConfig]
+
+Prisma CLI Version : 7.7.0
