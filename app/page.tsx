@@ -48,6 +48,7 @@ export default function Dashboard() {
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+  const [isDuplicate, setIsDuplicate] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -92,14 +93,22 @@ export default function Dashboard() {
 
   const handleOpenAddDrawer = () => {
     setEditingTransaction(null);
+    setIsDuplicate(false);
     setIsDrawerOpen(true);
   };
 
   const handleOpenEditDrawer = (transaction: Transaction) => {
     if (window.confirm('この取引を編集しますか？')) {
       setEditingTransaction(transaction);
+      setIsDuplicate(false);
       setIsDrawerOpen(true);
     }
+  };
+
+  const handleOpenDuplicateDrawer = (transaction: Transaction) => {
+    setEditingTransaction(transaction);
+    setIsDuplicate(true);
+    setIsDrawerOpen(true);
   };
 
   const handleDeleteTransaction = async (id: string) => {
@@ -110,7 +119,7 @@ export default function Dashboard() {
   };
 
   const handleFormSubmit = async (data: Omit<Transaction, 'id'>) => {
-    if (editingTransaction) {
+    if (editingTransaction && !isDuplicate) {
       // Update existing optimistically
       setTransactions(prev => prev.map(t =>
         t.id === editingTransaction.id ? { ...t, ...data } : t
@@ -128,6 +137,7 @@ export default function Dashboard() {
 
     setIsDrawerOpen(false);
     setEditingTransaction(null);
+    setIsDuplicate(false);
 
     // Auto-switch to the month of the added/edited transaction
     const targetMonth = data.date.substring(0, 7);
@@ -173,6 +183,7 @@ export default function Dashboard() {
                 categories={categories}
                 onEdit={handleOpenEditDrawer}
                 onDelete={handleDeleteTransaction}
+                onDuplicate={handleOpenDuplicateDrawer}
               />
             </section>
 
@@ -201,12 +212,13 @@ export default function Dashboard() {
       <Drawer
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
-        title={editingTransaction ? '出費の編集' : '出費の登録'}
+        title={editingTransaction ? (isDuplicate ? '出費の複製' : '出費の編集') : '出費の登録'}
       >
         <AddTransactionForm
           categories={categories}
           onSubmit={handleFormSubmit}
           initialData={editingTransaction}
+          isDuplicate={isDuplicate}
         />
       </Drawer>
     </main>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Edit2, Trash2 } from 'lucide-react';
+import { Edit2, Trash2, Copy } from 'lucide-react';
 import { Transaction, Category } from '@/types';
 import styles from './TransactionList.module.css';
 
@@ -8,9 +8,10 @@ interface TransactionListProps {
   categories: Category[];
   onEdit: (transaction: Transaction) => void;
   onDelete: (id: string) => void;
+  onDuplicate: (transaction: Transaction) => void;
 }
 
-export default function TransactionList({ transactions, categories, onEdit, onDelete }: TransactionListProps) {
+export default function TransactionList({ transactions, categories, onEdit, onDelete, onDuplicate }: TransactionListProps) {
   const getCategoryName = (id: string) => {
     return categories.find(c => c.id === id)?.name || '未分類';
   };
@@ -58,6 +59,13 @@ export default function TransactionList({ transactions, categories, onEdit, onDe
                             aria-label="Edit transaction"
                         >
                             <Edit2 size={16} />
+                        </button>
+                        <button 
+                            className={`${styles.actionButton} ${styles.duplicateButton}`}
+                            onClick={() => onDuplicate(t)}
+                            aria-label="Duplicate transaction"
+                        >
+                            <Copy size={16} />
                         </button>
                         <button 
                             className={`${styles.actionButton} ${styles.deleteButton}`}

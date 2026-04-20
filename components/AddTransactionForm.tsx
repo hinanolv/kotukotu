@@ -8,9 +8,10 @@ interface AddTransactionFormProps {
   categories: Category[];
   onSubmit: (transaction: Omit<Transaction, 'id'>) => void;
   initialData?: Transaction | null;
+  isDuplicate?: boolean;
 }
 
-export default function AddTransactionForm({ categories, onSubmit, initialData }: AddTransactionFormProps) {
+export default function AddTransactionForm({ categories, onSubmit, initialData, isDuplicate }: AddTransactionFormProps) {
   const today = new Date().toISOString().split('T')[0];
 
   const [date, setDate] = useState(today);
@@ -18,13 +19,13 @@ export default function AddTransactionForm({ categories, onSubmit, initialData }
   const [categoryId, setCategoryId] = useState(categories[0]?.id || '');
   const [memo, setMemo] = useState('');
 
-  // Update form values when initialData changes (for editing)
+  // Update form values when initialData changes (for editing or duplicating)
   useEffect(() => {
     if (initialData) {
       setDate(initialData.date);
       setAmount(String(initialData.amount));
       setCategoryId(initialData.categoryId);
-      setMemo(initialData.memo);
+      setMemo(initialData.memo || '');
     } else {
       // Reset to defaults if no initialData (switching back to "Add")
       setDate(today);
@@ -45,7 +46,7 @@ export default function AddTransactionForm({ categories, onSubmit, initialData }
       memo,
     });
 
-    if (!initialData) {
+    if (!initialData || isDuplicate) {
       setAmount('');
       setMemo('');
     }
@@ -104,7 +105,7 @@ export default function AddTransactionForm({ categories, onSubmit, initialData }
       </div>
 
       <button type="submit" className={styles.submitButton}>
-        {initialData ? '更新する' : '登録する'}
+        {initialData && !isDuplicate ? '更新する' : '登録する'}
       </button>
     </form>
   );

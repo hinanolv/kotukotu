@@ -113,6 +113,16 @@
   border-color: var(--accent);
 }
 
+.duplicateButton {
+  color: var(--success);
+}
+
+.duplicateButton:hover {
+  background: var(--success);
+  color: white;
+  border-color: var(--success);
+}
+
 .memo {
   color: var(--muted);
   max-width: 200px;
