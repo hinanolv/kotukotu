@@ -13,6 +13,7 @@ import MonthSwitcher from '@/components/MonthSwitcher';
 import CategoryPieChart from '@/components/CategoryPieChart';
 import ExportButton from '@/components/ExportButton';
 import BackupButton from '@/components/BackupButton';
+import { UserButton } from "@clerk/nextjs";
 import {
   fetchAllData, addCategoryAction, addTransactionAction,
   updateTransactionAction, deleteTransactionAction, updateBudgetAction
@@ -151,6 +152,7 @@ export default function Dashboard() {
             <BackupButton />
             <ExportButton transactions={transactions} categories={categories} />
             <ThemeToggle />
+            <UserButton />
           </div>
         </div>
       </header>

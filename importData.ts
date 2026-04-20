@@ -49,9 +49,9 @@ async function main() {
   for (const month of budgetMonths) {
     const amount = data.budgets[month];
     await prisma.budget.upsert({
-      where: { month },
+      where: { month_userId: { month, userId: 'anonymous' } },
       update: { amount },
-      create: { month, amount },
+      create: { month, amount, userId: 'anonymous' },
     });
   }
 

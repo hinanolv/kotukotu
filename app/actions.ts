@@ -2,14 +2,40 @@
 
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
+import { auth } from '@clerk/nextjs/server';
+
+async function getUserIdOrThrow() {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+  return userId;
+}
 
 export async function fetchAllData() {
+  const userId = await getUserIdOrThrow();
+
+  // "Claim Logic": Assign orphaned records (userId is null) to the first user
+  const orphanedCount = await prisma.transaction.count({ 
+    where: { 
+      OR: [{ userId: null }, { userId: 'anonymous' }] 
+    } 
+  });
+  
+  if (orphanedCount > 0) {
+    const orphanFilter = { OR: [{ userId: null }, { userId: 'anonymous' }] };
+    await prisma.$transaction([
+      prisma.category.updateMany({ where: orphanFilter, data: { userId } }),
+      prisma.transaction.updateMany({ where: orphanFilter, data: { userId } }),
+      prisma.budget.updateMany({ where: orphanFilter, data: { userId } }),
+    ]);
+  }
+
   const [categories, transactions, budgets] = await Promise.all([
-    prisma.category.findMany(),
+    prisma.category.findMany({ where: { userId } }),
     prisma.transaction.findMany({
+      where: { userId },
       orderBy: { date: 'desc' },
     }),
-    prisma.budget.findMany(),
+    prisma.budget.findMany({ where: { userId } }),
   ]);
 
   const formattedTransactions = transactions.map((t: any) => ({
@@ -17,7 +43,6 @@ export async function fetchAllData() {
     memo: t.memo === null ? undefined : t.memo,
   }));
 
-  // Transform budgets array into a record map { "yyyy-mm": amount }
   const budgetRecord = budgets.reduce((acc: Record<string, number>, current: { month: string; amount: number }) => {
     acc[current.month] = current.amount;
     return acc;
@@ -34,27 +59,31 @@ function formatTransaction(t: any) {
 }
 
 export async function addCategoryAction(name: string) {
+  const userId = await getUserIdOrThrow();
   const newCategory = await prisma.category.create({
-    data: { name },
+    data: { name, userId },
   });
   return newCategory;
 }
 
 export async function addTransactionAction(data: { date: string; amount: number; categoryId: string; memo?: string }) {
+  const userId = await getUserIdOrThrow();
   const newTransaction = await prisma.transaction.create({
     data: {
       date: data.date,
       amount: data.amount,
       categoryId: data.categoryId,
       memo: data.memo,
+      userId,
     },
   });
   return formatTransaction(newTransaction);
 }
 
 export async function updateTransactionAction(id: string, data: { date: string; amount: number; categoryId: string; memo?: string }) {
+  const userId = await getUserIdOrThrow();
   const updatedTransaction = await prisma.transaction.update({
-    where: { id },
+    where: { id, userId }, // Ensure user owns the record
     data: {
       date: data.date,
       amount: data.amount,
@@ -66,17 +95,22 @@ export async function updateTransactionAction(id: string, data: { date: string; 
 }
 
 export async function deleteTransactionAction(id: string) {
+  const userId = await getUserIdOrThrow();
   await prisma.transaction.delete({
-    where: { id },
+    where: { id, userId }, // Ensure user owns the record
   });
   return { success: true };
 }
 
 export async function updateBudgetAction(month: string, amount: number) {
+  const userId = await getUserIdOrThrow();
   const upsertedBudget = await prisma.budget.upsert({
-    where: { month },
+    where: { 
+      month_userId: { month, userId } 
+    },
     update: { amount },
-    create: { month, amount },
+    create: { month, amount, userId },
   });
+  revalidatePath('/');
   return upsertedBudget;
 }

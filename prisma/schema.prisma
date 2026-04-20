@@ -10,26 +10,36 @@ datasource db {
 model Category {
   id           String        @id @default(cuid())
   name         String
+  userId       String?
   transactions Transaction[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+
+  @@index([userId])
 }
 
 model Transaction {
   id         String   @id @default(cuid())
   date       String   // "2026-04-10" のような形式
   amount     Int
+  userId     String?
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id])
   memo       String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+
+  @@index([userId])
 }
 
 model Budget {
   id        String   @id @default(cuid())
-  month     String   @unique // "2026-04" のような形式
+  month     String   // "2026-04" のような形式
   amount    Int
+  userId    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([month, userId])
+  @@index([userId])
 }
