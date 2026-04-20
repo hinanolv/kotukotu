@@ -1,14 +1,29 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ClerkProvider } from "@clerk/nextjs";
 
+import PWARegistration from "@/components/PWARegistration";
+
 const inter = Inter({ subsets: ["latin"] });
 
+export const viewport: Viewport = {
+  themeColor: "#6366f1",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
+
 export const metadata: Metadata = {
-  title: "Kakeibo - 家計簿アプリ",
+  title: "Kotukotu - スマート家計簿",
   description: "毎月の出費をスマートに管理する家計簿アプリ",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Kotukotu",
+  },
 };
 
 export default function RootLayout({
@@ -19,10 +34,14 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="ja">
+        <head>
+          <link rel="apple-touch-icon" href="/icon-192.png" />
+        </head>
         <body className={inter.className}>
           <ThemeProvider>
             {children}
           </ThemeProvider>
+          <PWARegistration />
         </body>
       </html>
     </ClerkProvider>
