@@ -10,6 +10,7 @@ datasource db {
 model Category {
   id           String        @id @default(cuid())
   name         String
+  color        String?
   userId       String?
   transactions Transaction[]
   createdAt    DateTime      @default(now())

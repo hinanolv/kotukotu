@@ -33,6 +33,14 @@
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
+.input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+}
+
+:global([data-theme='dark']) .input::-webkit-calendar-picker-indicator {
+  filter: invert(0.8);
+}
+
 .inputAmount {
   font-size: 1.5rem;
   font-weight: 700;
@@ -64,4 +72,100 @@
 
 .submitButton:active {
   transform: translateY(0);
+}
+
+.labelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.manageButton {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.4rem;
+  transition: background 0.2s;
+}
+
+.manageButton:hover {
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.inlineAddForm {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+}
+
+.inlineInput {
+  padding: 0.6rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--card-border);
+  background: var(--background);
+  font-size: 0.875rem;
+}
+
+.inlineActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.inlineButton {
+  flex: 1;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.confirmButton {
+  background: var(--primary);
+  color: white;
+  border: none;
+}
+
+.cancelButton {
+  background: none;
+  border: 1px solid var(--card-border);
+  color: var(--muted);
+}
+
+.inlineColorPicker {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.inlineColorOption {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.2s;
+}
+
+.inlineColorOption:hover {
+  transform: scale(1.1);
+}
+
+.inlineColorOption.selected {
+  border-color: var(--foreground);
+  transform: scale(1.1);
 }

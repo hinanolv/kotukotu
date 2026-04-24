@@ -2,6 +2,7 @@ import React from 'react';
 import { Edit2, Trash2, Copy } from 'lucide-react';
 import { Transaction, Category } from '@/types';
 import styles from './TransactionList.module.css';
+import { getColorForCategory } from '@/lib/colors';
 
 interface TransactionListProps {
   transactions: Transaction[];
@@ -14,6 +15,11 @@ interface TransactionListProps {
 export default function TransactionList({ transactions, categories, onEdit, onDelete, onDuplicate }: TransactionListProps) {
   const getCategoryName = (id: string) => {
     return categories.find(c => c.id === id)?.name || '未分類';
+  };
+
+  const getCategoryColor = (id: string) => {
+    const cat = categories.find(c => c.id === id);
+    return getColorForCategory(cat?.name || '未分類', cat?.color);
   };
 
   if (transactions.length === 0) {
@@ -41,7 +47,12 @@ export default function TransactionList({ transactions, categories, onEdit, onDe
               <tr key={t.id} className={styles.tr}>
                 <td className={styles.td} data-label="内容">
                   <div className={styles.infoCell}>
-                    <span className={styles.categoryBadge}>{getCategoryName(t.categoryId)}</span>
+                    <span 
+                      className={styles.categoryBadge}
+                      style={{ backgroundColor: getCategoryColor(t.categoryId) }}
+                    >
+                      {getCategoryName(t.categoryId)}
+                    </span>
                     <span className={styles.dateText}>{t.date}</span>
                   </div>
                 </td>

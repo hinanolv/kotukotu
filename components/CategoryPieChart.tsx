@@ -5,17 +5,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recha
 import { Transaction, Category } from '@/types';
 import styles from './CategoryPieChart.module.css';
 
-// Fixed color palette for categories
-const COLORS = [
-  '#6366f1', // Indigo
-  '#10b981', // Emerald
-  '#f59e0b', // Amber
-  '#ef4444', // Red
-  '#8b5cf6', // Violet
-  '#ec4899', // Pink
-  '#06b6d4', // Cyan
-  '#f97316', // Orange
-];
+import { getColorForCategory } from '@/lib/colors';
 
 interface CategoryPieChartProps {
   transactions: Transaction[];
@@ -32,7 +22,14 @@ export default function CategoryPieChart({ transactions, categories }: CategoryP
     });
 
     return Object.entries(totals)
-      .map(([name, value]) => ({ name, value }))
+      .map(([name, value]) => {
+        const cat = categories.find(c => c.name === name);
+        return { 
+          name, 
+          value, 
+          color: getColorForCategory(name, cat?.color) 
+        };
+      })
       .sort((a, b) => b.value - a.value); // Sort by highest value
   }, [transactions, categories]);
 
@@ -70,8 +67,8 @@ export default function CategoryPieChart({ transactions, categories }: CategoryP
                 paddingAngle={5}
                 dataKey="value"
               >
-                {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                {data.map((entry: any, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
               <Tooltip content={<CustomTooltip />} />

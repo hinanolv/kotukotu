@@ -22,27 +22,45 @@
 .headerInner {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem 1.5rem;
+  padding: 0.75rem 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
 }
 
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logoWrapper {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+.logo {
+  width: 140px;
+  height: 52px;
+  object-fit: contain;
+  object-position: left center;
+  margin-left: -0.5rem;
+}
+
 .title {
-  font-size: 1.5rem;
-  font-weight: 800;
-  letter-spacing: -0.025em;
-  background: linear-gradient(135deg, var(--primary), #818cf8);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  display: none; /* Hide if still used elsewhere but not in header */
 }
 
 .subtitle {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   color: var(--muted);
   font-weight: 500;
+  border-left: 1px solid var(--card-border);
+  padding-left: 0.75rem;
+  margin-top: 0.15rem;
 }
 
 .headerActions {
@@ -116,14 +134,25 @@
 
 @media (max-width: 640px) {
   .headerInner {
-    padding: 1rem;
+    padding: 0.75rem 0.5rem;
   }
   
   .container {
     padding: 1rem;
   }
 
-  .title {
-    font-size: 1.25rem;
+  .brand {
+    gap: 0.5rem;
+  }
+
+  .logo {
+    width: 110px;
+    height: 40px;
+    margin-left: -0.25rem;
+  }
+
+  .subtitle {
+    font-size: 0.7rem;
+    padding-left: 0.75rem;
   }
 }

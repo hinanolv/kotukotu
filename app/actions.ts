@@ -58,12 +58,39 @@ function formatTransaction(t: any) {
   };
 }
 
-export async function addCategoryAction(name: string) {
+export async function addCategoryAction(name: string, color?: string) {
   const userId = await getUserIdOrThrow();
   const newCategory = await prisma.category.create({
-    data: { name, userId },
+    data: { name, color, userId },
   });
   return newCategory;
+}
+
+export async function updateCategoryAction(id: string, name: string, color?: string) {
+  const userId = await getUserIdOrThrow();
+  const updatedCategory = await prisma.category.update({
+    where: { id, userId },
+    data: { name, color },
+  });
+  return updatedCategory;
+}
+
+export async function deleteCategoryAction(id: string) {
+  const userId = await getUserIdOrThrow();
+  
+  // Check if there are transactions using this category
+  const transactionCount = await prisma.transaction.count({
+    where: { categoryId: id, userId }
+  });
+
+  if (transactionCount > 0) {
+    throw new Error("このカテゴリーを使用している取引があるため削除できません。");
+  }
+
+  await prisma.category.delete({
+    where: { id, userId },
+  });
+  return { success: true };
 }
 
 export async function addTransactionAction(data: { date: string; amount: number; categoryId: string; memo?: string }) {

@@ -4,7 +4,6 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Category, Transaction } from '@/types';
 import SummaryCard from '@/components/SummaryCard';
 import TransactionList from '@/components/TransactionList';
-import CategoryManager from '@/components/CategoryManager';
 import ThemeToggle from '@/components/ThemeToggle';
 import Drawer from '@/components/Drawer';
 import AddTransactionForm from '@/components/AddTransactionForm';
@@ -13,6 +12,8 @@ import MonthSwitcher from '@/components/MonthSwitcher';
 import CategoryPieChart from '@/components/CategoryPieChart';
 import ExportButton from '@/components/ExportButton';
 import BackupButton from '@/components/BackupButton';
+import CategoryDialog from '@/components/CategoryDialog';
+import { useTheme } from '@/components/ThemeProvider';
 import { UserButton } from "@clerk/nextjs";
 import {
   fetchAllData, addCategoryAction, addTransactionAction,
@@ -36,6 +37,7 @@ const DEFAULT_TRANSACTIONS: Transaction[] = [
 ];
 
 export default function Dashboard() {
+  const { theme } = useTheme();
   const [categories, setCategories] = useState<Category[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [budgets, setBudgets] = useState<Record<string, number>>({});
@@ -47,21 +49,24 @@ export default function Dashboard() {
   });
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [isDuplicate, setIsDuplicate] = useState(false);
 
+  const refreshData = async () => {
+    try {
+      const data = await fetchAllData();
+      setCategories(data.categories.length > 0 ? data.categories : DEFAULT_CATEGORIES);
+      setTransactions(data.transactions.length > 0 ? data.transactions : DEFAULT_TRANSACTIONS);
+      setBudgets(data.budgets);
+    } catch (error) {
+      console.error("Failed to fetch data:", error);
+    }
+  };
+
   useEffect(() => {
     setIsMounted(true);
-    fetchAllData()
-      .then(data => {
-        setCategories(data.categories.length > 0 ? data.categories : DEFAULT_CATEGORIES);
-        setTransactions(data.transactions.length > 0 ? data.transactions : DEFAULT_TRANSACTIONS);
-        setBudgets(data.budgets);
-      })
-      .catch(error => {
-        console.error("Failed to fetch data from NeonDB:", error);
-        alert("データベースからのデータ取得に失敗しました。Vercelの環境変数等の設定を確認してください。エラー: " + error.message);
-      });
+    refreshData();
   }, []);
 
   const filteredTransactions = useMemo(() => {
@@ -79,16 +84,6 @@ export default function Dashboard() {
   const handleUpdateBudget = async (newBudget: number) => {
     setBudgets(prev => ({ ...prev, [selectedMonth]: newBudget }));
     await updateBudgetAction(selectedMonth, newBudget);
-  };
-
-  const handleAddCategory = async (name: string) => {
-    const tempId = Math.random().toString(36).substr(2, 9);
-    const newCategory: Category = { id: tempId, name };
-    setCategories([...categories, newCategory]);
-
-    // Call server action
-    const savedCategory = await addCategoryAction(name);
-    setCategories(prev => prev.map(c => c.id === tempId ? savedCategory : c));
   };
 
   const handleOpenAddDrawer = () => {
@@ -120,13 +115,11 @@ export default function Dashboard() {
 
   const handleFormSubmit = async (data: Omit<Transaction, 'id'>) => {
     if (editingTransaction && !isDuplicate) {
-      // Update existing optimistically
       setTransactions(prev => prev.map(t =>
         t.id === editingTransaction.id ? { ...t, ...data } : t
       ));
       await updateTransactionAction(editingTransaction.id, data);
     } else {
-      // Add new optimistically
       const tempId = Math.random().toString(36).substr(2, 9);
       const newTransaction: Transaction = { id: tempId, ...data };
       setTransactions(prev => [newTransaction, ...prev]);
@@ -139,7 +132,6 @@ export default function Dashboard() {
     setEditingTransaction(null);
     setIsDuplicate(false);
 
-    // Auto-switch to the month of the added/edited transaction
     const targetMonth = data.date.substring(0, 7);
     if (targetMonth !== selectedMonth) {
       setSelectedMonth(targetMonth);
@@ -147,16 +139,22 @@ export default function Dashboard() {
   };
 
   if (!isMounted) {
-    return null; // Prevent hydration mismatch by not rendering anything on SSR
+    return null; 
   }
+
+  const logoSrc = theme === 'dark' ? '/kotukotu_dark_logo.png' : '/kotukotu_light_logo.png';
 
   return (
     <main className={styles.main}>
       <header className={styles.header}>
         <div className={styles.headerInner}>
-          <div>
-            <h1 className={styles.title}>Kotukotu</h1>
-            <p className={styles.subtitle}>{selectedMonth.replace('-', '年')}月の支出状況</p>
+          <div className={styles.brand}>
+            <h1 className={styles.logoWrapper}>
+              <img src={logoSrc} alt="Kotukotu" className={styles.logo} />
+            </h1>
+            <div className={styles.brandText}>
+              <p className={styles.subtitle}>{selectedMonth.replace('-', '年')}月の支出状況</p>
+            </div>
           </div>
           <div className={styles.headerActions}>
             <BackupButton />
@@ -186,11 +184,6 @@ export default function Dashboard() {
                 onDuplicate={handleOpenDuplicateDrawer}
               />
             </section>
-
-            <CategoryManager
-              categories={categories}
-              onAddCategory={handleAddCategory}
-            />
           </div>
 
           <div className={styles.sideColumn}>
@@ -217,10 +210,19 @@ export default function Dashboard() {
         <AddTransactionForm
           categories={categories}
           onSubmit={handleFormSubmit}
+          onManageCategories={() => setIsCategoryDialogOpen(true)}
+          onRefreshCategories={refreshData}
           initialData={editingTransaction}
           isDuplicate={isDuplicate}
         />
       </Drawer>
+
+      <CategoryDialog 
+        isOpen={isCategoryDialogOpen}
+        onClose={() => setIsCategoryDialogOpen(false)}
+        categories={categories}
+        onUpdate={refreshData}
+      />
     </main>
   );
 }

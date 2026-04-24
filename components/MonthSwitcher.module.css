@@ -47,7 +47,7 @@
 .calendarIcon {
   position: absolute;
   left: 0.3rem;
-  color: var(--muted);
+  color: var(--primary);
   pointer-events: none;
 }
 
