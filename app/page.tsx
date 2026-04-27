@@ -157,10 +157,14 @@ export default function Dashboard() {
             </div>
           </div>
           <div className={styles.headerActions}>
-            <BackupButton />
-            <ExportButton transactions={transactions} categories={categories} />
+            <div className={styles.desktopOnly}>
+              <BackupButton />
+              <ExportButton transactions={transactions} categories={categories} />
+            </div>
             <ThemeToggle />
-            <UserButton />
+            <div className={styles.desktopOnly}>
+              <UserButton />
+            </div>
           </div>
         </div>
       </header>
