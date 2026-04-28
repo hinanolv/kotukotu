@@ -1,7 +1,7 @@
 export type Category = {
   id: string;
   name: string;
-  color?: string;
+  color?: string | null;
 };
 
 export type Transaction = {
@@ -9,7 +9,7 @@ export type Transaction = {
   date: string;
   amount: number;
   categoryId: string;
-  memo: string;
+  memo?: string | null;
 };
 
 export type Theme = 'light' | 'dark';

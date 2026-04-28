@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { auth } from '@clerk/nextjs/server';
+import { Category, Transaction } from '@/types';
 
 async function getUserIdOrThrow() {
   const { userId } = await auth();
@@ -38,9 +39,18 @@ export async function fetchAllData() {
     prisma.budget.findMany({ where: { userId } }),
   ]);
 
-  const formattedTransactions = transactions.map((t: any) => ({
-    ...t,
-    memo: t.memo === null ? undefined : t.memo,
+  const formattedTransactions: Transaction[] = transactions.map((t) => ({
+    id: t.id,
+    date: t.date,
+    amount: t.amount,
+    categoryId: t.categoryId,
+    memo: t.memo,
+  }));
+
+  const formattedCategories: Category[] = categories.map((c) => ({
+    id: c.id,
+    name: c.name,
+    color: c.color,
   }));
 
   const budgetRecord = budgets.reduce((acc: Record<string, number>, current: { month: string; amount: number }) => {
@@ -48,17 +58,24 @@ export async function fetchAllData() {
     return acc;
   }, {});
 
-  return { categories, transactions: formattedTransactions, budgets: budgetRecord };
-}
-
-function formatTransaction(t: any) {
-  return {
-    ...t,
-    memo: t.memo === null ? undefined : t.memo,
+  return { 
+    categories: formattedCategories, 
+    transactions: formattedTransactions, 
+    budgets: budgetRecord 
   };
 }
 
-export async function addCategoryAction(name: string, color?: string) {
+function formatTransaction(t: any): Transaction {
+  return {
+    id: t.id,
+    date: t.date,
+    amount: t.amount,
+    categoryId: t.categoryId,
+    memo: t.memo,
+  };
+}
+
+export async function addCategoryAction(name: string, color?: string | null) {
   const userId = await getUserIdOrThrow();
   const newCategory = await prisma.category.create({
     data: { name, color, userId },
@@ -66,7 +83,7 @@ export async function addCategoryAction(name: string, color?: string) {
   return newCategory;
 }
 
-export async function updateCategoryAction(id: string, name: string, color?: string) {
+export async function updateCategoryAction(id: string, name: string, color?: string | null) {
   const userId = await getUserIdOrThrow();
   const updatedCategory = await prisma.category.update({
     where: { id, userId },
@@ -93,7 +110,7 @@ export async function deleteCategoryAction(id: string) {
   return { success: true };
 }
 
-export async function addTransactionAction(data: { date: string; amount: number; categoryId: string; memo?: string }) {
+export async function addTransactionAction(data: Omit<Transaction, 'id'>) {
   const userId = await getUserIdOrThrow();
   const newTransaction = await prisma.transaction.create({
     data: {
@@ -107,7 +124,7 @@ export async function addTransactionAction(data: { date: string; amount: number;
   return formatTransaction(newTransaction);
 }
 
-export async function updateTransactionAction(id: string, data: { date: string; amount: number; categoryId: string; memo?: string }) {
+export async function updateTransactionAction(id: string, data: Omit<Transaction, 'id'>) {
   const userId = await getUserIdOrThrow();
   const updatedTransaction = await prisma.transaction.update({
     where: { id, userId }, // Ensure user owns the record

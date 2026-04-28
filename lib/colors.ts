@@ -8,7 +8,7 @@ export const CATEGORY_COLORS: Record<string, string> = {
   'その他': '#94a3b8',      // Slate
 };
 
-export const getColorForCategory = (name: string, customColor?: string): string => {
+export const getColorForCategory = (name: string, customColor?: string | null): string => {
   if (customColor) return customColor;
   return CATEGORY_COLORS[name] || '#6366f1'; // Default to Indigo
 };
