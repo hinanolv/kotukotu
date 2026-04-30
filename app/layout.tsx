@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { ClerkProvider } from "@clerk/nextjs";
 
 import PWARegistration from "@/components/PWARegistration";
+import IdleLogout from "@/components/IdleLogout";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -32,13 +33,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider afterSignOutUrl="/" afterSignInUrl="/">
       <html lang="ja">
         <head>
           <link rel="apple-touch-icon" href="/icon-192.png" />
         </head>
         <body className={inter.className}>
           <ThemeProvider>
+            <IdleLogout />
             {children}
           </ThemeProvider>
           <PWARegistration />

@@ -14,7 +14,9 @@ import ExportButton from '@/components/ExportButton';
 import BackupButton from '@/components/BackupButton';
 import CategoryDialog from '@/components/CategoryDialog';
 import { useTheme } from '@/components/ThemeProvider';
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, Show, useAuth } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+import LandingPage from '@/components/LandingPage';
 import {
   fetchAllData, addCategoryAction, addTransactionAction,
   updateTransactionAction, deleteTransactionAction, updateBudgetAction
@@ -38,6 +40,8 @@ const DEFAULT_TRANSACTIONS: Transaction[] = [
 
 export default function Dashboard() {
   const { theme } = useTheme();
+  const { isSignedIn } = useAuth();
+  const router = useRouter();
   const [categories, setCategories] = useState<Category[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [budgets, setBudgets] = useState<Record<string, number>>({});
@@ -66,8 +70,16 @@ export default function Dashboard() {
 
   useEffect(() => {
     setIsMounted(true);
-    refreshData();
   }, []);
+
+  useEffect(() => {
+    if (isMounted) {
+      if (isSignedIn) {
+        refreshData();
+      }
+      router.refresh();
+    }
+  }, [isMounted, isSignedIn, router]);
 
   const filteredTransactions = useMemo(() => {
     return transactions
@@ -145,88 +157,95 @@ export default function Dashboard() {
   const logoSrc = theme === 'dark' ? '/kotukotu_dark_logo.png' : '/kotukotu_light_logo.png';
 
   return (
-    <main className={styles.main}>
-      <header className={styles.header}>
-        <div className={styles.headerInner}>
-          <div className={styles.brand}>
-            <h1 className={styles.logoWrapper}>
-              <img src={logoSrc} alt="Kotukotu" className={styles.logo} />
-            </h1>
-            <div className={styles.brandText}>
-              <p className={styles.subtitle}>{selectedMonth.replace('-', '年')}月の支出状況</p>
-            </div>
-          </div>
-          <div className={styles.headerActions}>
-            <div className={styles.desktopOnly}>
-              <BackupButton />
-              <ExportButton transactions={transactions} categories={categories} />
-            </div>
-            <ThemeToggle />
-            <div className={styles.desktopOnly}>
-              <UserButton />
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <div className={styles.container}>
-        <div className={styles.toolbar}>
-          <MonthSwitcher currentMonth={selectedMonth} onChange={setSelectedMonth} />
-        </div>
-
-        <div className={styles.contentGrid}>
-          <div className={styles.mainColumn}>
-            <section className={styles.section}>
-              <div className={styles.sectionHeader}>
-                <h2 className={styles.sectionTitle}>取引履歴 ({selectedMonth.replace('-', '年')}月)</h2>
+    <>
+      <Show when="signed-in">
+        <main className={styles.main}>
+          <header className={styles.header}>
+            <div className={styles.headerInner}>
+              <div className={styles.brand}>
+                <h1 className={styles.logoWrapper}>
+                  <img src={logoSrc} alt="Kotukotu" className={styles.logo} />
+                </h1>
+                <div className={styles.brandText}>
+                  <p className={styles.subtitle}>{selectedMonth.replace('-', '年')}月の支出状況</p>
+                </div>
               </div>
-              <TransactionList
-                transactions={filteredTransactions}
-                categories={categories}
-                onEdit={handleOpenEditDrawer}
-                onDelete={handleDeleteTransaction}
-                onDuplicate={handleOpenDuplicateDrawer}
-              />
-            </section>
+              <div className={styles.headerActions}>
+                <div className={styles.desktopOnly}>
+                  <BackupButton />
+                  <ExportButton transactions={transactions} categories={categories} />
+                </div>
+                <ThemeToggle />
+                <div className={styles.desktopOnly}>
+                  <UserButton afterSignOutUrl="/" />
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <div className={styles.container}>
+            <div className={styles.toolbar}>
+              <MonthSwitcher currentMonth={selectedMonth} onChange={setSelectedMonth} />
+            </div>
+
+            <div className={styles.contentGrid}>
+              <div className={styles.mainColumn}>
+                <section className={styles.section}>
+                  <div className={styles.sectionHeader}>
+                    <h2 className={styles.sectionTitle}>取引履歴 ({selectedMonth.replace('-', '年')}月)</h2>
+                  </div>
+                  <TransactionList
+                    transactions={filteredTransactions}
+                    categories={categories}
+                    onEdit={handleOpenEditDrawer}
+                    onDelete={handleDeleteTransaction}
+                    onDuplicate={handleOpenDuplicateDrawer}
+                  />
+                </section>
+              </div>
+
+              <div className={styles.sideColumn}>
+                <SummaryCard
+                  total={totalAmount}
+                  budget={currentBudget}
+                  onUpdateBudget={handleUpdateBudget}
+                />
+                <CategoryPieChart
+                  transactions={filteredTransactions}
+                  categories={categories}
+                />
+              </div>
+            </div>
           </div>
 
-          <div className={styles.sideColumn}>
-            <SummaryCard
-              total={totalAmount}
-              budget={currentBudget}
-              onUpdateBudget={handleUpdateBudget}
-            />
-            <CategoryPieChart
-              transactions={filteredTransactions}
+          <FAB onClick={handleOpenAddDrawer} />
+
+          <Drawer
+            isOpen={isDrawerOpen}
+            onClose={() => setIsDrawerOpen(false)}
+            title={editingTransaction ? (isDuplicate ? '出費の複製' : '出費の編集') : '出費の登録'}
+          >
+            <AddTransactionForm
               categories={categories}
+              onSubmit={handleFormSubmit}
+              onManageCategories={() => setIsCategoryDialogOpen(true)}
+              onRefreshCategories={refreshData}
+              initialData={editingTransaction}
+              isDuplicate={isDuplicate}
             />
-          </div>
-        </div>
-      </div>
+          </Drawer>
 
-      <FAB onClick={handleOpenAddDrawer} />
-
-      <Drawer
-        isOpen={isDrawerOpen}
-        onClose={() => setIsDrawerOpen(false)}
-        title={editingTransaction ? (isDuplicate ? '出費の複製' : '出費の編集') : '出費の登録'}
-      >
-        <AddTransactionForm
-          categories={categories}
-          onSubmit={handleFormSubmit}
-          onManageCategories={() => setIsCategoryDialogOpen(true)}
-          onRefreshCategories={refreshData}
-          initialData={editingTransaction}
-          isDuplicate={isDuplicate}
-        />
-      </Drawer>
-
-      <CategoryDialog 
-        isOpen={isCategoryDialogOpen}
-        onClose={() => setIsCategoryDialogOpen(false)}
-        categories={categories}
-        onUpdate={refreshData}
-      />
-    </main>
+          <CategoryDialog 
+            isOpen={isCategoryDialogOpen}
+            onClose={() => setIsCategoryDialogOpen(false)}
+            categories={categories}
+            onUpdate={refreshData}
+          />
+        </main>
+      </Show>
+      <Show when="signed-out">
+        <LandingPage />
+      </Show>
+    </>
   );
 }
